@@ -214,10 +214,6 @@ void deleteHash(struct list *list, unsigned char *hash) {
         deleteItem(item);
 }
 
-/*
- * todo: добавить setHashLeaf, поскольку leaf получаю для блокирования семафора;
- *  полагаю, что эта оптимизация не принесет большой оптимизации, так как getLeaf почти линейна
- */
 struct item *setHash(struct list *list, unsigned char *hash) {
     struct list *leaf = getLeaf(list, hash);
 

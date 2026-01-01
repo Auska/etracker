@@ -104,17 +104,14 @@ unsigned char renderAnnouncePeersCallback(struct list *list, struct item *peer, 
     char ip[INET6_ADDRSTRLEN] = {0};
 
     if (query->compact || query->protocol == URI_QUERY_PROTOCOL_UDP) {
-        // todo сделать правильный разбор ip4/6
         if (query->ipVersion & SOCKET_VERSION_IPV4_BIT) {
-            unsigned char *ip6 = (unsigned char *) &peerDataL->ip4;
-            unsigned char *ip4 = ip6 + 12;
+            unsigned char *ip4 = (unsigned char *) &peerDataL->ip4 + 12;
             addStringBlock(peerBlock, ip4, sizeof(int));
         } else
             addStringBlock(peerBlock, &peerDataL->ip6, sizeof(struct in6_addr));
 
         addStringBlock(peerBlock, &peerDataL->port, sizeof(short));
     } else if (query->no_peer_id) {
-        // todo сделать правильный разбор ip4/6
         if (query->ipVersion & SOCKET_VERSION_IPV4_BIT)
             int2ip(ip, &peerDataL->ip4, query->ipVersion);
         else
@@ -139,7 +136,6 @@ unsigned char renderAnnouncePeersCallback(struct list *list, struct item *peer, 
 
         addStringBlock(peerBlock, peer->hash, URI_PARAM_VALUE_LENGTH);
 
-        // todo сделать правильный разбор ip4/6
         if (query->ipVersion & SOCKET_VERSION_IPV4_BIT)
             int2ip(ip, &peerDataL->ip4, query->ipVersion);
         else
@@ -496,7 +492,6 @@ void changeTorrentStatsL(struct item *torrent, unsigned char oldEvent, unsigned 
     }
 }
 
-// todo сделать правильный разбор ip4/6
 void int2ip(char *dest, struct in6_addr *source, unsigned char ipVersion) {
     unsigned char *src6 = (unsigned char *) source;
     unsigned char *src4 = src6 + 12;
