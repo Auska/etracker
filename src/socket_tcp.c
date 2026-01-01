@@ -23,10 +23,6 @@
 
 #define SOCKET_TCP_SOCKET_QUEUE_LENGTH 150
 
-#define SOCKET_TCP_MAX_CWD 500
-#define SOCKET_TCP_WEB_PATH "web"
-#define SOCKET_TCP_SEPARATOR_PATH "/"
-
 
 void *serverTcpHandler(struct serverTcpArgs *args) {
     pthreadSetName(pthread_self(), "TCP listen");
@@ -45,18 +41,6 @@ void *serverTcpHandler(struct serverTcpArgs *args) {
     char *xForwardedFor = args->xForwardedFor;
 
     c_free(args);
-
-    if (chdir(SOCKET_TCP_WEB_PATH) == -1) {
-        exitPrint(EXIT_CODE_CHDIR, __FILE__, EXIT_CODE_PRINT_ERROR_YES);
-    }
-
-    char webRoot[SOCKET_TCP_MAX_CWD + 1];
-
-    if (getcwd(webRoot, SOCKET_TCP_MAX_CWD) == NULL) {
-        exitPrint(EXIT_CODE_CWD, __FILE__, EXIT_CODE_PRINT_ERROR_YES);
-    }
-    strcat(webRoot, SOCKET_TCP_SEPARATOR_PATH);
-    printf("webRoot: '%s'\n", webRoot);
 
     struct block *authorizationHeader = initBlock();
 
@@ -108,8 +92,6 @@ void *serverTcpHandler(struct serverTcpArgs *args) {
         clientTcpArgs->socketTimeout = socketTimeout;
         clientTcpArgs->keepAlive = keepAlive;
         clientTcpArgs->charset = charset;
-        clientTcpArgs->webRoot = webRoot;
-
         clientTcpArgs->xForwardedFor = xForwardedFor;
 
         if (pthread_create(&tcpClientThread, NULL, (void *(*)(void *)) clientTcpHandler, clientTcpArgs) != 0) {

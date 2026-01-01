@@ -8,7 +8,6 @@
 #include "data_garbage.h"
 #include "stats.h"
 #include "interval.h"
-#include "websocket.h"
 #include "rps.h"
 #include "list.h"
 #include "socket.h"
@@ -16,7 +15,6 @@
 #include "thread.h"
 #include "exit_code.h"
 #include "et_math.h"
-#include "websocket.h"
 
 #define THREAD_GARBAGE_GARBAGE_SOCKET_LOOP_SLEEP 1
 #define THREAD_GARBAGE_LITTLE_SLEEP 10

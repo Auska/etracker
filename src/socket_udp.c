@@ -16,7 +16,6 @@
 #include "sem.h"
 #include "exit_code.h"
 #include "interval.h"
-#include "geoip.h"
 #include "socket.h"
 
 // Размер заголовка пакета scrape + 74 x info_hash (по протоколу это максимальное кол-во)

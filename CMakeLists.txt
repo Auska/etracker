@@ -46,7 +46,6 @@ set(SERVER_SOURCES
     src/math.c
     src/exit_code.c
     src/sha1.c
-    src/geoip.c
 )
 
 set(CLIENT_SOURCES
@@ -63,7 +62,6 @@ set(TEST_SOURCES
     src/sha1.c
     src/string.c
     src/exit_code.c
-    src/geoip.c
 )
 
 # Get git revision for versioning
@@ -96,16 +94,10 @@ install(TARGETS etracker client test
     RUNTIME DESTINATION bin
 )
 
-# Install web files
-install(DIRECTORY web/
-    DESTINATION share/etracker/web
-)
-
 # Install scripts
 install(PROGRAMS
     scripts/run
     scripts/run_chroot
-    scripts/initWeb
     scripts/aauto_tests_run
     scripts/ffunctional_tests_run
     DESTINATION bin

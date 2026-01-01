@@ -33,7 +33,6 @@
 - `data.c` / `data_structure.c` - 数据管理和结构
 - `list.c` - 自定义链表实现(支持哈希索引)
 - `stats.c` - 统计信息收集
-- `geoip.c` - 地理位置数据库支持
 - `equeue.c` - 事件队列管理
 - `socket_garbage.c` / `data_garbage.c` / `thread_garbage.c` - 垃圾回收机制
 
@@ -47,10 +46,10 @@
 
 ### 编译
 
-**使用 CMake(推荐)**:
+**使用 CMake**:
 ```bash
-cmake .
-make
+cmake -B build
+cmake --build build
 ```
 
 这将在 `build/` 目录中生成可执行文件:
@@ -59,8 +58,8 @@ make
 - `test` - 单元测试程序
 
 **编译选项**:
-- Debug 模式: `cmake -DCMAKE_BUILD_TYPE=Debug .`
-- Release 模式: `cmake -DCMAKE_BUILD_TYPE=Release .`
+- Debug 模式: `cmake -DCMAKE_BUILD_TYPE=Debug -B build`
+- Release 模式: `cmake -DCMAKE_BUILD_TYPE=Release -B build`
 
 **GitHub Actions CI**:
 项目使用 GitHub Actions 进行持续集成,在每次 push 到 master 分支时自动构建服务器。
@@ -96,7 +95,6 @@ make
 - `-k, --keep-alive` - 启用 HTTP keep-alive
 - `--no-tcp` - 禁用 TCP
 - `--no-udp` - 禁用 UDP
-- `--no-locations` - 禁用地理位置数据库
 - `--charset` - 字符集(默认 utf-8)
 - `--locale` - 区域设置(默认 en_US.UTF-8)
 - `--nofile` - 文件描述符限制
@@ -119,12 +117,11 @@ make
 
 或手动运行:
 ```bash
-cd build && make test && ./test
+cd build && ./test
 ```
 
 测试覆盖:
 - 数据结构测试
-- GeoIP 测试
 - SHA-1 测试
 - Base64 测试
 - 信号量测试
@@ -147,32 +144,11 @@ cd build && make test && ./test
 
 测试用例位于 `functional_tests/` 目录,包含 71 个测试场景。
 
-## Web 界面
-
-### 接口
-
-- **Announce**: `http://host:port/announce` 或 `udp://host:port/announce`
-- **Scrape**: `http://host:port/scrape` 或 `udp://host:port/scrape`
-
-### Web 页面
-
-1. **统计页面**: `http://host:port/stats.html`
-   - 显示服务器统计信息、负载、RPS、内存使用等
-
-2. **设置页面**: `http://host:port/settings.html`
-   - 需要先运行 `./scripts/initWeb` 下载 jQuery
-
-### 初始化 Web 资源
-
-```bash
-./scripts/initWeb  # 下载 jQuery 到 web/js/
-```
-
 ## 开发约定
 
 ### 代码风格
 
-- **语言**: 纯 C(C11 标准)
+- **语言**: 纯 C(C23 标准)
 - **编译器**: GCC 或 Clang(支持 Apple LLVM)
 - **编码风格**:
   - 使用小写字母和下划线命名函数和变量
@@ -227,7 +203,6 @@ etracker/
 │   ├── data_garbage.c        # 数据垃圾回收
 │   ├── list.c                # 自定义链表
 │   ├── stats.c               # 统计信息
-│   ├── geoip.c               # 地理位置支持
 │   ├── alloc.c               # 内存分配
 │   ├── string.c              # 字符串处理
 │   ├── block.c               # 块缓冲
@@ -261,7 +236,6 @@ etracker/
 │   ├── et_string.h
 │   ├── et_time.h
 │   ├── exit_code.h
-│   ├── geoip.h
 │   ├── interval.h
 │   ├── list.h
 │   ├── rps.h
@@ -278,21 +252,12 @@ etracker/
 │   ├── thread_garbage.h
 │   ├── thread.h
 │   ├── udp_request.h
-│   ├── uri.h
-│   └── websocket.h
+│   └── uri.h
 ├── scripts/              # 脚本目录
 │   ├── run                   # 启动脚本
 │   ├── run_chroot            # Chroot 启动脚本
-│   ├── initWeb               # Web 资源初始化
 │   ├── aauto_tests_run       # 自动化测试脚本
 │   └── ffunctional_tests_run # 功能测试脚本
-├── web/                  # Web 界面资源
-│   ├── map.html              # 世界地图
-│   ├── stats.html            # 统计页面
-│   ├── settings.html         # 设置页面
-│   ├── css/                  # 样式文件
-│   ├── js/                   # JavaScript 文件
-│   └── images/               # 图片资源
 ├── tests/                # 测试文件
 │   ├── test.c                # 单元测试
 │   └── test_struct.c         # 结构测试
@@ -303,7 +268,6 @@ etracker/
 ├── .github/              # GitHub Actions CI 配置
 │   └── workflows/
 │       └── c-cpp.yml
-├── HOW_TO_ADD_LOCALE.md # Locale 配置指南
 ├── LICENSE               # 许可证
 ├── README.md             # 项目说明
 └── IFLOW.md              # 本文档
@@ -319,9 +283,6 @@ etracker/
 
 - **编译时**: GCC 或 Clang, CMake 3.10+
 - **运行时**: 无外部依赖(纯 C 实现)
-- **可选功能**:
-  - IP2LOCATION-LITE-DB5.CSV(用于地理位置显示)
-  - jQuery(通过 `./scripts/initWeb` 下载)
 
 ## 性能优化
 
@@ -347,11 +308,9 @@ etracker/
 
 ## 注意事项
 
-1. **Locale 配置**: 如需使用特定语言环境,请参考 `HOW_TO_ADD_LOCALE.md`
-2. **地理位置数据库**: 世界地图功能需要下载 IP2LOCATION-LITE-DB5.CSV
-3. **文件描述符限制**: 高并发场景下需要增加 `nofile` 限制(建议 64000)
-4. **内存规划**: 根据 peers 和 torrents 数量规划内存使用
-5. **负载监控**: 根据负载平均值动态调整间隔时间
+1. **文件描述符限制**: 高并发场景下需要增加 `nofile` 限制(建议 64000)
+2. **内存规划**: 根据 peers 和 torrents 数量规划内存使用
+3. **负载监控**: 根据负载平均值动态调整间隔时间
 
 ## Git 提交规范
 

@@ -24,7 +24,6 @@
 #include "list.h"
 #include "data_garbage.h"
 #include "argument.h"
-#include "geoip.h"
 #include "exit_code.h"
 
 #if !defined(REVISION)
@@ -94,13 +93,6 @@ int main(int argc, char *argv[]) {
     stats->failed = arguments->failed;
 
     struct rps rps = {};
-
-    struct geoip *geoip = initGeoip(arguments->noLocations);
-    if (!arguments->noLocations)
-        loadGeoip(geoip, 1);
-    struct geoip *getLimitGeoip = findGeoip(geoip, 0);
-    if (getLimitGeoip->startIp != 0)
-        exitPrint(EXIT_CODE_GEOIP_TEST_FAILED, __FILE__, EXIT_CODE_PRINT_ERROR_NO);
 
     // Влияет на вывод: printf("%'s", 12.12);
     // Влияет на atof

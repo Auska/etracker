@@ -11,10 +11,7 @@
 #include "data_structure.h"
 #include "sha1.h"
 #include "et_string.h"
-#include "geoip.h"
 #include "exit_code.h"
-
-int testGeoip();
 
 int testStructure();
 
@@ -32,7 +29,6 @@ int main() {
     printf("Starting tests\n");
 
     printf("testStructure complete = %d\n", testStructure());
-    printf("testGeoip complete = %d\n", testGeoip());
     printf("testSha1 complete = %d\n", testSha1());
     printf("testBase64 complete = %d\n", testBase64());
     printf("testSem complete = %d\n", testSem());
@@ -46,45 +42,6 @@ int testStructure() {
 
     printf("before changes: 40 40 24 24\n");
     printf("after  changes: 32 40 24 16\n");
-
-    return 1;
-}
-
-int testGeoip() {
-    struct geoip *geoip = initGeoip(0);
-    loadGeoip(geoip, 0);
-
-    unsigned int ip = 1570630176;
-    printf("ip:%u\n", ip);
-    struct geoip *middle = findGeoip(geoip, ip);
-    printf(" s:%u e:%u %f %f\n", middle->startIp, middle->endIp, middle->lat, middle->lon);
-    assert(middle->startIp <= ip);
-    assert(ip <= middle->endIp);
-
-    ip = 4294967295;
-    printf("ip:%u\n", ip);
-    middle = findGeoip(geoip, ip);
-    printf(" s:%u e:%u %f %f\n", middle->startIp, middle->endIp, middle->lat, middle->lon);
-    assert(middle->startIp <= ip);
-    assert(ip <= middle->endIp);
-
-    ip = 0;
-    printf("ip:%u\n", ip);
-    middle = findGeoip(geoip, ip);
-    printf(" s:%u e:%u %f %f\n", middle->startIp, middle->endIp, middle->lat, middle->lon);
-    assert(middle->startIp <= ip);
-    assert(ip <= middle->endIp);
-
-    printf("start loop\n");
-    for (int i = 0; i < 256000; ++i) {
-        ip = (unsigned int) rand();
-        middle = findGeoip(geoip, ip);
-        assert(middle->startIp <= ip);
-        assert(ip <= middle->endIp);
-    }
-    printf("end loop\n");
-
-    freeGeoip(geoip);
 
     return 1;
 }

@@ -6,7 +6,6 @@
 #include "udp_request.h"
 #include "rps.h"
 #include "interval.h"
-#include "geoip.h"
 
 struct clientUdpArgs {
     int serverSocket;
@@ -26,7 +25,6 @@ struct clientUdpArgs {
     unsigned int *maxPeersPerResponse;
 
     struct list *websockets;
-    struct geoip *geoip;
 };
 
 void *clientUdpHandler(struct clientUdpArgs *);

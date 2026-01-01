@@ -7,7 +7,6 @@
 #include <errno.h>
 #include <stdatomic.h>
 #include <limits.h>
-#include <sys/stat.h>
 #include "thread_client_tcp.h"
 #include "sem.h"
 #include "alloc.h"
@@ -23,8 +22,6 @@
 #include "et_math.h"
 
 #define THREAD_CLIENT_TCP_RECEIVED_MESSAGE_LENGTH 4000
-
-#define THREAD_CLIENT_TCP_MAX_FILE_SIZE 2000000
 
 struct deleteSocketListArgs {
     struct list *socketList;
@@ -61,7 +58,6 @@ void processRead(struct clientTcpArgs *args, int currentSocket, struct list *del
     unsigned short *socketTimeout = args->socketTimeout;
     unsigned char *keepAlive = args->keepAlive;
     char *charset = args->charset;
-    char *webRoot = args->webRoot;
     char *xForwardedFor = args->xForwardedFor;
 
     unsigned char *pCurrentSocket = (unsigned char *) &currentSocket;
@@ -144,7 +140,6 @@ void processRead(struct clientTcpArgs *args, int currentSocket, struct list *del
 
     _Bool isHttp = 0;
     int canKeepAlive = 0;
-    int isWebsocket = 0;
     sendBlock = resetBlock(sendBlock);
 
     stats->recv_bytes += readSize;
@@ -286,77 +281,9 @@ void processRead(struct clientTcpArgs *args, int currentSocket, struct list *del
             }
         } // scrape
         else {
-            dataBlock = resetBlock(dataBlock);
-
-            char *typeIco = "image/x-icon";
-            char *typePng = "image/png";
-            char *typeHtml = "text/html";
-            char *typeJs = "application/javascript";
-            char *typeCss = "text/css";
-            char *typeJpg = "image/jpeg";
-            char *typeDefault = "text/plain";
-            char *typeFile = NULL;
-
-            struct query query = {};
-            parseUri(&query, NULL, NULL, readBuffer);
-            char absolute[PATH_MAX + 1];
-
-            struct stat statFile;
-
-            // Нет файла
-            if (realpath(query.path, absolute) == NULL) {
-                addFormatStringBlock(dataBlock, 1000, "Page not found: %d: %s", errno, strerror(errno));
-                struct render render = {sendBlock, 404, dataBlock->data, dataBlock->size, canKeepAlive,
-                                        *socketTimeout, stats};
-                renderHttpMessage(&render);
-            }
-                // Не находится в каталоге web
-            else if (!startsWith(webRoot, absolute)) {
-                struct render render = {sendBlock, 404, "Page not found: Secure error", 28, canKeepAlive,
-                                        *socketTimeout, stats};
-                renderHttpMessage(&render);
-            }
-                // Функцию stat вернула ошибку
-            else if (stat(absolute, &statFile) == -1) {
-                addFormatStringBlock(dataBlock, 1000, "Page not found: Stat failed: %d: %s", errno, strerror(errno));
-                struct render render = {sendBlock, 404, dataBlock->data, dataBlock->size, canKeepAlive,
-                                        *socketTimeout, stats};
-                renderHttpMessage(&render);
-            }
-                // Это не файл
-            else if (!S_ISREG(statFile.st_mode)) {
-                struct render render = {sendBlock, 404, "Page not found: Not a file", 26, canKeepAlive,
-                                        *socketTimeout, stats};
-                renderHttpMessage(&render);
-            }
-                // Размер больше допустимого
-            else if (statFile.st_size > THREAD_CLIENT_TCP_MAX_FILE_SIZE) {
-                struct render render = {sendBlock, 507, "File size exceeds the allowed limit",
-                                        35, canKeepAlive, *socketTimeout, stats};
-                renderHttpMessage(&render);
-            }
-                // Проверка пройдена
-            else {
-                if (endsWith(".ico", absolute))
-                    typeFile = typeIco;
-                else if (endsWith(".png", absolute))
-                    typeFile = typePng;
-                else if (endsWith(".html", absolute))
-                    typeFile = typeHtml;
-                else if (endsWith(".js", absolute))
-                    typeFile = typeJs;
-                else if (endsWith(".css", absolute))
-                    typeFile = typeCss;
-                else if (endsWith(".jpg", absolute))
-                    typeFile = typeJpg;
-                else
-                    typeFile = typeDefault;
-
-                addFileBlock(dataBlock, statFile.st_size, absolute);
-                struct render render = {sendBlock, 200, dataBlock->data, dataBlock->size, canKeepAlive,
-                                        *socketTimeout, stats, NULL, typeFile};
-                renderHttpMessage(&render);
-            }
+            struct render render = {sendBlock, 404, "Page not found", 14, canKeepAlive,
+                                    *socketTimeout, stats};
+            renderHttpMessage(&render);
         } // default
 
         if (canKeepAlive) {
@@ -373,7 +300,7 @@ void processRead(struct clientTcpArgs *args, int currentSocket, struct list *del
 
     send_(currentSocket, sendBlock->data, sendBlock->size, stats, 0);
 
-    if (!canKeepAlive && !isWebsocket) {
+    if (!canKeepAlive) {
         setHash(deleteSocketList, pCurrentSocket);
     }
 }

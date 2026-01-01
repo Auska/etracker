@@ -360,9 +360,6 @@ void showHelp() {
             "     %3d     semaphore init\n"
             "     %3d     semaphore post\n"
             "     %3d     semaphore destroy\n"
-            "     %3d     geoip memory\n"
-            "     %3d     geoip wrong data\n"
-            "     %3d     geoip test failed\n"
             "     %3d     argument unknown\n"
             "\n"
             STRING_BOLD "AUTHOR\n" STRING_RESET
@@ -398,9 +395,6 @@ void showHelp() {
             EXIT_CODE_SEMAPHORE_INIT,
             EXIT_CODE_SEMAPHORE_POST,
             EXIT_CODE_SEMAPHORE_DESTROY,
-            EXIT_CODE_GEOIP_MEMORY,
-            EXIT_CODE_GEOIP_WRONG_DATA,
-            EXIT_CODE_GEOIP_TEST_FAILED,
             EXIT_CODE_ARGUMENT_UNKNOWN
     );
 
