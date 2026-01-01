@@ -141,6 +141,17 @@ int main(int argc, char *argv[]) {
             printf("Receive: index=%d size=%d\n", i, n);
             printHex(buffer, n);
         }
+
+        // After connect response, update connection_id for subsequent requests
+        if (i == 0 && n >= 16) {
+            // Extract connection_id from response (bytes 8-11)
+            uint32_t connection_id = *(uint32_t *)&buffer[8];
+            // Update hello[1] (announce) connection_id
+            memcpy(hello[1], &connection_id, sizeof(uint32_t));
+            // Update hello[2] (scrape) connection_id
+            memcpy(hello[2], &connection_id, sizeof(uint32_t));
+        }
+
         close(sockfd);
     }
 
