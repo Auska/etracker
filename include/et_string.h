@@ -21,9 +21,9 @@
 #define STRING_BOLD "\e[1m"            /* Bold */
 #define STRING_UNDERLINE "\e[4m"       /* Underline */
 
-_Bool startsWith(const char *start, const char *string);
+[[nodiscard]] _Bool startsWith(const char *start, const char *string);
 
-_Bool endsWith(const char *end, const char *string);
+[[nodiscard]] _Bool endsWith(const char *end, const char *string);
 
 int printHex(char *string, unsigned int len);
 

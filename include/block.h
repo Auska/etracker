@@ -7,11 +7,11 @@ struct block {
     unsigned int allocated;
 };
 
-struct block *initBlock();
+[[nodiscard]] struct block *initBlock();
 
 void freeBlock(struct block *block);
 
-struct block *resetBlock(struct block * block);
+[[nodiscard]] struct block *resetBlock(struct block * block);
 
 void addStringBlock(struct block *block, void *string, unsigned int requiredSpace);
 

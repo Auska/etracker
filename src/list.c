@@ -50,7 +50,7 @@ struct list *initList(struct list *list, unsigned char level, unsigned char nest
         exitPrint(EXIT_CODE_LIST_WRONG_HASH_LENGTH, __FILE__, EXIT_CODE_PRINT_ERROR_NO);
     }
 
-    if (list == NULL)
+    if (list == nullptr)
         list = c_calloc(1, sizeof(struct list));
 
     list->level = level;
@@ -109,7 +109,7 @@ void freeList(struct list *list, unsigned char firstRecursion) {
 
 unsigned char mapList(struct list *list, void *args,
                       unsigned char (*callback)(struct list *list, struct item *item, void *args)) {
-    if (list == NULL)
+    if (list == nullptr)
         return 0;
 
     if (list->level > 0) {
@@ -125,7 +125,7 @@ unsigned char mapList(struct list *list, void *args,
 
             struct item *currentItem = list->firstItem;
 
-            while (currentItem != NULL) {
+            while (currentItem != nullptr) {
                 struct item *nextItem = currentItem->nextInLeaf;
                 unsigned char test = (*callback)(list, currentItem, args);
 
@@ -167,7 +167,7 @@ void printList(struct list *list, unsigned char nest, struct block *block, _Bool
 
             struct item *currentItem = list->firstItem;
 
-            while (currentItem != NULL) {
+            while (currentItem != nullptr) {
                 // Здесь не поставил точку и наблюдал в консоле атрефакты
                 print && printf("%.*s ", list->hashLength, currentItem->hash);
                 addFormatStringBlock(block, 100, "%.*s ", list->hashLength, currentItem->hash);
@@ -188,19 +188,19 @@ void printList(struct list *list, unsigned char nest, struct block *block, _Bool
 }
 
 void deleteItem(struct item *item) {
-    if (item->previousInLeaf == NULL) {
+    if (item->previousInLeaf == nullptr) {
         item->leaf->firstItem = item->nextInLeaf;
-        if (item->nextInLeaf != NULL) {
-            item->nextInLeaf->previousInLeaf = NULL;
+        if (item->nextInLeaf != nullptr) {
+            item->nextInLeaf->previousInLeaf = nullptr;
         }
     } else {
         item->previousInLeaf->nextInLeaf = item->nextInLeaf;
-        if (item->nextInLeaf != NULL) {
+        if (item->nextInLeaf != nullptr) {
             item->nextInLeaf->previousInLeaf = item->previousInLeaf;
         }
     }
 
-    if (item->data != NULL) {
+    if (item->data != nullptr) {
         c_free(item->data);
     }
     c_free(item->hash);
@@ -210,7 +210,7 @@ void deleteItem(struct item *item) {
 void deleteHash(struct list *list, unsigned char *hash) {
     struct item *item = getHash(list, hash);
 
-    if (item != NULL)
+    if (item != nullptr)
         deleteItem(item);
 }
 
@@ -221,11 +221,11 @@ void deleteHash(struct list *list, unsigned char *hash) {
 struct item *setHash(struct list *list, unsigned char *hash) {
     struct list *leaf = getLeaf(list, hash);
 
-    struct item *item = NULL;
+    struct item *item = nullptr;
 
-    struct item *previousItem = NULL;
+    struct item *previousItem = nullptr;
     struct item *currentItem = leaf->firstItem;
-    while (currentItem != NULL) {
+    while (currentItem != nullptr) {
         int hashCompare = memcmp(currentItem->hash, hash, leaf->hashLength);
         if (hashCompare == 0) {
             item = currentItem;
@@ -240,7 +240,7 @@ struct item *setHash(struct list *list, unsigned char *hash) {
         currentItem = currentItem->nextInLeaf;
     }
 
-    if (item == NULL) {
+    if (item == nullptr) {
         item = c_calloc(1, sizeof(struct item));
 
         item->hash = c_malloc(leaf->hashLength);
@@ -253,13 +253,13 @@ struct item *setHash(struct list *list, unsigned char *hash) {
         item->nextInLeaf = currentItem;
 
         // Обновить соседей в ветке
-        if (previousItem != NULL)
+        if (previousItem != nullptr)
             previousItem->nextInLeaf = item;
 
-        if (currentItem != NULL)
+        if (currentItem != nullptr)
             currentItem->previousInLeaf = item;
 
-        if (previousItem == NULL)
+        if (previousItem == nullptr)
             leaf->firstItem = item;
     }
 
@@ -270,7 +270,7 @@ struct item *getHash(struct list *list, unsigned char *hash) {
     struct list *leaf = getLeaf(list, hash);
 
     struct item *currentItem = leaf->firstItem;
-    while (currentItem != NULL) {
+    while (currentItem != nullptr) {
         int hashCompare = memcmp(currentItem->hash, hash, leaf->hashLength);
         if (hashCompare == 0) {
 
@@ -283,7 +283,7 @@ struct item *getHash(struct list *list, unsigned char *hash) {
         currentItem = currentItem->nextInLeaf;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 struct rk_sema *getLeafSemaphore(struct list *list, unsigned char *hash) {

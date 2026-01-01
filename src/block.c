@@ -28,8 +28,8 @@ struct block *initBlock() {
 }
 
 void freeBlock(struct block *block) {
-    if (block == NULL) {
-        printf("Cant freeBlock, block == NULL\n");
+    if (block == nullptr) {
+        printf("Cant freeBlock, block == nullptr\n");
 
         return;
     }
@@ -39,7 +39,7 @@ void freeBlock(struct block *block) {
 }
 
 struct block *resetBlock(struct block *block) {
-    if (block == NULL)
+    if (block == nullptr)
         return initBlock();
 
 
@@ -80,7 +80,7 @@ void addFileBlock(struct block *block, unsigned int requiredSpace, char *filenam
 
     FILE *file = fopen(filename, "rb");
 
-    if (file != NULL) {
+    if (file != nullptr) {
         size_t readSize = fread(&block->data[block->size], 1, requiredSpace, file);
 
         if (readSize == requiredSpace) {

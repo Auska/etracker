@@ -1,6 +1,8 @@
 #ifndef SC6_SEM_H
 #define SC6_SEM_H
 
+#include <stdint.h>
+
 #ifdef __APPLE__
 #include <dispatch/dispatch.h>
 #else
@@ -17,7 +19,6 @@ struct rk_sema {
     dispatch_semaphore_t    semaphoreQueue;
 #else
     sem_t semaphoreQueue;
-    #define uint32_t u_int32_t
 #endif
 };
 

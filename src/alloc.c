@@ -19,7 +19,7 @@ void *c_malloc(int size) {
     ALLOC_STRICT_MEMORY_ENABLE && rk_sema_post(&semAlloc);
 
     void *result = malloc(size);
-    if (result == NULL) {
+    if (result == nullptr) {
         printf("Malloc failure, size = %d\n", size);
     }
 
@@ -32,7 +32,7 @@ void *c_calloc(int count, int size) {
     ALLOC_STRICT_MEMORY_ENABLE && rk_sema_post(&semAlloc);
 
     void *result = calloc(count, size);
-    if (result == NULL) {
+    if (result == nullptr) {
         printf("Calloc failure, count = %d, size = %d\n", count, size);
     }
 
@@ -50,7 +50,7 @@ void c_free(void *pointer) {
 void *c_realloc(void *pointer, size_t size) {
     void *result = realloc(pointer, size);
 
-    if(result == NULL) {
+    if(result == nullptr) {
         printf("Realloc failure, needSize = %zu\n", size);
     }
 

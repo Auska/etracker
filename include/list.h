@@ -46,11 +46,11 @@ void waitSemaphoreLeaf(struct list *leaf);
 
 void postSemaphoreLeaf(struct list *leaf);
 
-struct list *getLeaf(struct list *list, unsigned char *hash);
+[[nodiscard]] struct list *getLeaf(struct list *list, unsigned char *hash);
 
-struct list *reInitList(struct list *list, unsigned char level);
+[[nodiscard]] struct list *reInitList(struct list *list, unsigned char level);
 
-struct list *initList(struct list *list, unsigned char level, unsigned char nest, unsigned char hashLength,
+[[nodiscard]] struct list *initList(struct list *list, unsigned char level, unsigned char nest, unsigned char hashLength,
                       unsigned char semaphoreEnabled, unsigned short endianness);
 
 void freeList(struct list *list, unsigned char firstRecursion);
@@ -64,10 +64,10 @@ void deleteItem(struct item *item);
 
 void deleteHash(struct list *list, unsigned char *hash);
 
-struct item *setHash(struct list *list, unsigned char *hash);
+[[nodiscard]] struct item *setHash(struct list *list, unsigned char *hash);
 
-struct item *getHash(struct list *list, unsigned char *hash);
+[[nodiscard]] struct item *getHash(struct list *list, unsigned char *hash);
 
-struct rk_sema *getLeafSemaphore(struct list *list, unsigned char *hash);
+[[nodiscard]] struct rk_sema *getLeafSemaphore(struct list *list, unsigned char *hash);
 
 #endif //SC6_LIST_H
