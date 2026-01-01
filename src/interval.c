@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <math.h>
+#include <time.h>
+#include "interval.h"
+#include "et_math.h"
+
+unsigned int niceInterval(struct interval *interval, unsigned int value);
+
+void updateInterval(struct block *block, struct interval *interval, double maxLoadAvg) {
+    double load[3];
+
+    if (getloadavg(load, 3) == -1) {
+        printf("getloadavg failed: %d, %s\n", errno, strerror(errno));
+
+        return;
+    }
+
+    double maxAllowLoadAverage = (maxLoadAvg == 0)
+            ? (((double) sysconf(_SC_NPROCESSORS_ONLN)) - 0.5)
+            : maxLoadAvg;
+
+    unsigned int localInterval = interval->requireInterval;
+
+    if (load[0] < maxAllowLoadAverage && load[1] < maxAllowLoadAverage && load[2] < maxAllowLoadAverage)
+        localInterval -= INTERVAL_STEP_S;
+    else if (load[0] > maxAllowLoadAverage && load[1] > maxAllowLoadAverage && load[2] > maxAllowLoadAverage)
+        localInterval += INTERVAL_STEP_S;
+
+    localInterval = niceInterval(interval, localInterval);
+
+    interval->previousInterval = interval->requireInterval;
+    interval->requireInterval = localInterval;
+
+    if (block != NULL)
+        addFormatStringBlock(block, 1000,
+                             "LA: %.2f %.2f %.2f  ML: %.2f  I: %d (%d->%d) s",
+                             load[0], load[1], load[2], maxAllowLoadAverage,
+                             interval->interval, interval->previousInterval, interval->requireInterval);
+}
+
+void forceUpdateInterval(struct interval *interval, unsigned int value) {
+    value = niceInterval(interval, value);
+
+    interval->interval = value;
+    interval->requireInterval = value;
+    interval->previousInterval = value;
+}
+
+/**
+ * Изменяет фактический интервал
+ * @param interval
+ * @return Кол-во секунд для сна из учёта, что:
+ *  за max(interval->previousInterval, interval->requireInterval) секунд интервал успеет измениться на STEP_INTERVAL с.
+ */
+unsigned int stepInterval(struct interval *interval) {
+    if (interval->interval < interval->requireInterval)
+        interval->interval++;
+    else if (interval->interval > interval->requireInterval)
+        interval->interval--;
+
+    return max(round((double) interval->previousInterval / INTERVAL_STEP_S), 1u);
+}
+
+/**
+ * @param interval
+ * @param value
+ * @return допустимый интервал
+ */
+unsigned int niceInterval(struct interval *interval, unsigned int value) {
+    value = max(interval->minInterval, value);
+    value = min(interval->maxInterval, value);
+
+    return value;
+}
