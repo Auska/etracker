@@ -274,7 +274,7 @@ void processRead(struct clientTcpArgs *args, int currentSocket, struct list *del
         else if (startsWith("GET /api/websocket", readBuffer)) {
             struct block *acceptValue = websocketKey2Accept(readBuffer, readSize);
 
-            if (acceptValue == NULL) {
+            if (acceptValue == nullptr) {
                 struct render render = {sendBlock, 400, "Websocket Failed", 16, canKeepAlive,
                                         *socketTimeout, stats};
                 renderHttpMessage(&render);
@@ -287,6 +287,7 @@ void processRead(struct clientTcpArgs *args, int currentSocket, struct list *del
                                         acceptValue->data};
                 renderHttpMessage(&render);
                 freeBlock(acceptValue);
+                acceptValue = nullptr;
 
                 waitSemaphoreLeaf(websockets);
                 setHash(websockets, (unsigned char *) &currentSocket);

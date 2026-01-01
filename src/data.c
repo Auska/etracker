@@ -34,11 +34,25 @@ void changeTorrentStatsL(struct item *torrent, unsigned char oldEvent, unsigned 
 struct item *setTorrentL(struct list *torrentList, unsigned char *hash) {
     struct item *torrent = setHash(torrentList, hash);
 
+    // Double-checked locking pattern to prevent race condition
+    if (torrent->data == nullptr) {
+        // Allocate memory outside of lock for performance
+        void *newData = c_calloc(1, sizeof(struct torrentDataL));
+        if (newData == nullptr) {
+            return torrent;
+        }
 
-    if (torrent->data == NULL) {
-        torrent->data = c_calloc(1, sizeof(struct torrentDataL));
-        ((struct torrentDataL *) torrent->data)->peerList =
-                initList(NULL, 0, LIST_STARTING_NEST, URI_PARAM_VALUE_LENGTH, LIST_SEMAPHORE_DISABLE, BIG_ENDIAN);
+        // Initialize peer list
+        ((struct torrentDataL *) newData)->peerList =
+                initList(nullptr, 0, LIST_STARTING_NEST, URI_PARAM_VALUE_LENGTH, LIST_SEMAPHORE_DISABLE, BIG_ENDIAN);
+
+        // Atomic pointer assignment
+        if (atomic_compare_exchange_strong((_Atomic void**)&torrent->data, &(void*){nullptr}, newData)) {
+            // Success: our allocation was used
+        } else {
+            // Another thread already allocated, free our attempt
+            c_free(newData);
+        }
     }
 
     return torrent;

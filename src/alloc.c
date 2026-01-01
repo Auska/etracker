@@ -52,6 +52,7 @@ void *c_realloc(void *pointer, size_t size) {
 
     if(result == nullptr) {
         printf("Realloc failure, needSize = %zu\n", size);
+        /* Keep the original pointer, caller handles the failure */
     }
 
     return result;

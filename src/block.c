@@ -66,8 +66,21 @@ void addFormatStringBlock(struct block *block, unsigned int requiredSpace, char 
 
     va_list argList;
     va_start(argList, format);
-    block->size += vsprintf(&block->data[block->size], format, argList);
+    int written = vsnprintf(&block->data[block->size], block->allocated - block->size, format, argList);
     va_end(argList);
+
+    if (written < 0) {
+        printf("vsnprintf error\n");
+        return;
+    }
+
+    if ((unsigned int)written >= block->allocated - block->size) {
+        printf("vsnprintf truncated, needed %d, available %u\n", 
+               written, block->allocated - block->size);
+        block->size = block->allocated - 1;
+    } else {
+        block->size += written;
+    }
 
     // Для printf
     block->data[block->size] = 0;

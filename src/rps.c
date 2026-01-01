@@ -17,14 +17,16 @@ void updateRps(struct rps *rps, unsigned char protocol, unsigned char ipVersion)
     unsigned char index = getRpsIndex(protocol, ipVersion);
 
     if (rps->status == RPS_TIME_ODD) {
-        rps->odd[index]++;
-        if (rps->odd[index] > rps->max[index]) {
-            rps->max[index] = rps->odd[index];
+        unsigned int new_value = atomic_fetch_add(&rps->odd[index], 1) + 1;
+        unsigned int current_max = atomic_load(&rps->max[index]);
+        if (new_value > current_max) {
+            atomic_compare_exchange_strong(&rps->max[index], &current_max, new_value);
         }
     } else {
-        rps->even[index]++;
-        if (rps->even[index] > rps->max[index]) {
-            rps->max[index] = rps->even[index];
+        unsigned int new_value = atomic_fetch_add(&rps->even[index], 1) + 1;
+        unsigned int current_max = atomic_load(&rps->max[index]);
+        if (new_value > current_max) {
+            atomic_compare_exchange_strong(&rps->max[index], &current_max, new_value);
         }
     }
 }
@@ -32,8 +34,14 @@ void updateRps(struct rps *rps, unsigned char protocol, unsigned char ipVersion)
 float getRps(struct rps *rps, unsigned char protocol, unsigned char ipVersion) {
     unsigned char index = getRpsIndex(protocol, ipVersion);
 
-    float rpm = (float) ((rps->status == RPS_TIME_ODD) ? rps->even[index] : rps->odd[index]);
+    unsigned int value;
+    if (atomic_load(&rps->status) == RPS_TIME_ODD) {
+        value = atomic_load(&rps->even[index]);
+    } else {
+        value = atomic_load(&rps->odd[index]);
+    }
 
+    float rpm = (float) value;
     return rpm / RPS_PERIOD_S;
 }
 
@@ -43,7 +51,7 @@ unsigned char getRpsIndex(unsigned char protocol, unsigned char ipVersion) {
 
 void resetMaxRps(struct rps *rps) {
     for (int index = 0; index < RPS_DIFFERENT_VALUES; ++index) {
-        rps->max[index] = 0;
+        atomic_store(&rps->max[index], 0);
     }
 }
 
@@ -53,14 +61,14 @@ void *rpsStatusHandler(struct rps *rps) {
     while (1) {
         if (rps->status == RPS_TIME_EVEN) {
             for (int index = 0; index < RPS_DIFFERENT_VALUES; ++index) {
-                rps->odd[index] = 0;
+                atomic_store(&rps->odd[index], 0);
             }
-            rps->status = RPS_TIME_ODD;
+            atomic_store(&rps->status, RPS_TIME_ODD);
         } else {
             for (int index = 0; index < RPS_DIFFERENT_VALUES; ++index) {
-                rps->even[index] = 0;
+                atomic_store(&rps->even[index], 0);
             }
-            rps->status = RPS_TIME_EVEN;
+            atomic_store(&rps->status, RPS_TIME_EVEN);
         }
 
         sleep(RPS_PERIOD_S);
