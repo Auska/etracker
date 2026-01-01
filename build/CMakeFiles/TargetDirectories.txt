@@ -1,9 +1,0 @@
-/home/code/etracker/build/CMakeFiles/etracker.dir
-/home/code/etracker/build/CMakeFiles/client.dir
-/home/code/etracker/build/CMakeFiles/test.dir
-/home/code/etracker/build/CMakeFiles/edit_cache.dir
-/home/code/etracker/build/CMakeFiles/rebuild_cache.dir
-/home/code/etracker/build/CMakeFiles/list_install_components.dir
-/home/code/etracker/build/CMakeFiles/install.dir
-/home/code/etracker/build/CMakeFiles/install/local.dir
-/home/code/etracker/build/CMakeFiles/install/strip.dir

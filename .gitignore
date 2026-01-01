@@ -1,6 +1,9 @@
 # IDE
 /.idea
 
+# build directory
+/build/
+
 # make/debug results
 /cmake-build-debug
 /client.o.dSYM
