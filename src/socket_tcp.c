@@ -42,8 +42,6 @@ void *serverTcpHandler(struct serverTcpArgs *args) {
     unsigned short *socketTimeout = args->socketTimeout;
     unsigned char *keepAlive = args->keepAlive;
     char *charset = args->charset;
-    struct list *websockets = args->websockets;
-    struct geoip *geoip = args->geoip;
     char *xForwardedFor = args->xForwardedFor;
 
     c_free(args);
@@ -111,8 +109,6 @@ void *serverTcpHandler(struct serverTcpArgs *args) {
         clientTcpArgs->keepAlive = keepAlive;
         clientTcpArgs->charset = charset;
         clientTcpArgs->webRoot = webRoot;
-        clientTcpArgs->websockets = websockets;
-        clientTcpArgs->geoip = geoip;
 
         clientTcpArgs->xForwardedFor = xForwardedFor;
 

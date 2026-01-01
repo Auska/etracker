@@ -95,9 +95,6 @@ int main(int argc, char *argv[]) {
 
     struct rps rps = {};
 
-    struct list *websockets = initList(NULL, 0, LIST_STARTING_NEST, sizeof(int),
-                                       LIST_SEMAPHORE_ENABLE_LEAF | LIST_SEMAPHORE_ENABLE_GLOBAL, LITTLE_ENDIAN);
-
     struct geoip *geoip = initGeoip(arguments->noLocations);
     if (!arguments->noLocations)
         loadGeoip(geoip, 1);
@@ -129,8 +126,6 @@ int main(int argc, char *argv[]) {
         serverTcpArgs->socketTimeout = &arguments->socketTimeout;
         serverTcpArgs->keepAlive = &arguments->keepAlive;
         serverTcpArgs->charset = arguments->charset;
-        serverTcpArgs->websockets = websockets;
-        serverTcpArgs->geoip = geoip;
         serverTcpArgs->xForwardedFor = arguments->xForwardedFor;
 
         if (pthread_create(&tcpServerThread, NULL, (void *(*)(void *)) serverTcpHandler, serverTcpArgs) != 0) {
@@ -150,8 +145,6 @@ int main(int argc, char *argv[]) {
         serverUdpArgs->rps = &rps;
         serverUdpArgs->workers = arguments->workers;
         serverUdpArgs->maxPeersPerResponse = &arguments->maxPeersPerResponse;
-        serverUdpArgs->websockets = websockets;
-        serverUdpArgs->geoip = geoip;
 
         if (pthread_create(&udpServerThread, NULL, (void *(*)(void *)) serverUdpHandler, serverUdpArgs) != 0) {
             perror("Could not create thread");
@@ -170,7 +163,7 @@ int main(int argc, char *argv[]) {
 
     runGarbageCollectorThread(torrentList, &interval, &rps, arguments->maxLoadAvg);
     runIntervalChangerThread(&interval);
-    runGarbageSocketTimeoutThread(socketLists, stats, &arguments->socketTimeout, arguments->workers, websockets);
+    runGarbageSocketTimeoutThread(socketLists, stats, &arguments->socketTimeout, arguments->workers, nullptr);
 
     /*
      * Причины паузы:

@@ -13,7 +13,6 @@
 #include "data.h"
 #include "thread.h"
 #include "sem.h"
-#include "websocket.h"
 #include "socket.h"
 
 #define THREAD_CLIENT_UDP__MSG_CONFIRM 0
@@ -35,8 +34,6 @@ void *clientUdpHandler(struct clientUdpArgs *args) {
     struct rk_sema *semaphoreRequest = args->semaphoreRequest;
     // unsigned int threadNumber = args->threadNumber;
     unsigned int *maxPeersPerResponse = args->maxPeersPerResponse;
-    struct list *websockets = args->websockets;
-    struct geoip *geoip = args->geoip;
 
     c_free(args);
 
@@ -141,9 +138,6 @@ void *clientUdpHandler(struct clientUdpArgs *args) {
                     } else {
                         stats->send_pass_udp++;
                     }
-
-                    if (query.ipVersion & SOCKET_VERSION_IPV4_BIT)
-                        broadcast(websockets, geoip, clientAddr.sin6_addr, stats, WEBSOCKET_PROTOCOL_UDP);
                 } // аннонс
 
             } else if (block->size > scrapeRequestSize &&

@@ -34,7 +34,6 @@
 - `list.c` - 自定义链表实现(支持哈希索引)
 - `stats.c` - 统计信息收集
 - `geoip.c` - 地理位置数据库支持
-- `websocket.c` - WebSocket 支持(用于实时地图)
 - `equeue.c` - 事件队列管理
 - `socket_garbage.c` / `data_garbage.c` / `thread_garbage.c` - 垃圾回收机制
 
@@ -160,11 +159,7 @@ cd build && make test && ./test
 1. **统计页面**: `http://host:port/stats.html`
    - 显示服务器统计信息、负载、RPS、内存使用等
 
-2. **实时世界地图**: `http://host:port/map.html`
-   - 需要下载 IP2LOCATION-LITE-DB5.CSV 数据库
-   - 显示全球 peer 分布的实时地图
-
-3. **设置页面**: `http://host:port/settings.html`
+2. **设置页面**: `http://host:port/settings.html`
    - 需要先运行 `./scripts/initWeb` 下载 jQuery
 
 ### 初始化 Web 资源
@@ -233,7 +228,6 @@ etracker/
 │   ├── list.c                # 自定义链表
 │   ├── stats.c               # 统计信息
 │   ├── geoip.c               # 地理位置支持
-│   ├── websocket.c           # WebSocket 支持
 │   ├── alloc.c               # 内存分配
 │   ├── string.c              # 字符串处理
 │   ├── block.c               # 块缓冲

@@ -64,8 +64,6 @@ void *serverUdpHandler(struct serverUdpArgs *args) {
     struct rps *rps = args->rps;
     long workers = args->workers;
     unsigned int *maxPeersPerResponse = args->maxPeersPerResponse;
-    struct list *websockets = args->websockets;
-    struct geoip *geoip = args->geoip;
 
     c_free(args);
 
@@ -109,9 +107,6 @@ void *serverUdpHandler(struct serverUdpArgs *args) {
         clientUdpArgs->semaphoreRequest = &semaphoreRequest;
         clientUdpArgs->rps = rps;
         clientUdpArgs->maxPeersPerResponse = maxPeersPerResponse;
-
-        clientUdpArgs->websockets = websockets;
-        clientUdpArgs->geoip = geoip;
 
         // Поток
         pthread_t udpClientThread;

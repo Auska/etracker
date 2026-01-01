@@ -46,7 +46,6 @@ set(SERVER_SOURCES
     src/math.c
     src/exit_code.c
     src/sha1.c
-    src/websocket.c
     src/geoip.c
 )
 

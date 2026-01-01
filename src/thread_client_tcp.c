@@ -21,7 +21,6 @@
 #include "basic.h"
 #include "thread.h"
 #include "et_math.h"
-#include "websocket.h"
 
 #define THREAD_CLIENT_TCP_RECEIVED_MESSAGE_LENGTH 4000
 
@@ -30,7 +29,6 @@
 struct deleteSocketListArgs {
     struct list *socketList;
     struct stats *stats;
-    struct list *websockets;
 };
 
 unsigned char deleteSocketListCallback(struct list *list, struct item *item, void *args) {
@@ -40,13 +38,10 @@ unsigned char deleteSocketListCallback(struct list *list, struct item *item, voi
 
     struct list *socketList = ((struct deleteSocketListArgs *) args)->socketList;
     struct stats *stats = ((struct deleteSocketListArgs *) args)->stats;
-    struct list *websockets = ((struct deleteSocketListArgs *) args)->websockets;
     int socket = *(int *) item->hash;
 
     deleteSocketL(socketList, socket, stats);
     deleteItem(item);
-
-    deleteWebsocket(websockets, socket);
 
     return LIST_CONTINUE_RETURN;
 }
@@ -67,8 +62,6 @@ void processRead(struct clientTcpArgs *args, int currentSocket, struct list *del
     unsigned char *keepAlive = args->keepAlive;
     char *charset = args->charset;
     char *webRoot = args->webRoot;
-    struct list *websockets = args->websockets;
-    struct geoip *geoip = args->geoip;
     char *xForwardedFor = args->xForwardedFor;
 
     unsigned char *pCurrentSocket = (unsigned char *) &currentSocket;
@@ -112,11 +105,7 @@ void processRead(struct clientTcpArgs *args, int currentSocket, struct list *del
         return;
     } // read error
 
-    waitSemaphoreLeaf(websockets);
-    struct item *websocket = getHash(websockets, (unsigned char *) &currentSocket);
-    postSemaphoreLeaf(websockets);
-
-    if (strstr(readBuffer, "\r\n\r\n") == NULL && websocket == NULL) {
+    if (strstr(readBuffer, "\r\n\r\n") == NULL) {
 
         return;
     }
@@ -152,12 +141,6 @@ void processRead(struct clientTcpArgs *args, int currentSocket, struct list *del
 
         return;
     } // read error
-
-    // Не принимаю любые сообщения от websocket, использую их только для поддержания keepAlive
-    if (websocket != NULL) {
-        // printf("websocket ping\n");
-        return;
-    }
 
     _Bool isHttp = 0;
     int canKeepAlive = 0;
@@ -228,9 +211,6 @@ void processRead(struct clientTcpArgs *args, int currentSocket, struct list *del
                                         *socketTimeout, stats};
                 renderHttpMessage(&render);
             }
-
-            if (query.ipVersion & SOCKET_VERSION_IPV4_BIT)
-                broadcast(websockets, geoip, clientAddr.sin6_addr, stats, WEBSOCKET_PROTOCOL_TCP);
         } // announce
         else if (startsWith("GET /api/set", readBuffer)) {
             if (authorizationHeader->size == 0)
@@ -271,29 +251,6 @@ void processRead(struct clientTcpArgs *args, int currentSocket, struct list *del
                 renderHttpMessage(&render);
             }
         } // set
-        else if (startsWith("GET /api/websocket", readBuffer)) {
-            struct block *acceptValue = websocketKey2Accept(readBuffer, readSize);
-
-            if (acceptValue == nullptr) {
-                struct render render = {sendBlock, 400, "Websocket Failed", 16, canKeepAlive,
-                                        *socketTimeout, stats};
-                renderHttpMessage(&render);
-            } else {
-                isWebsocket = 1;
-                struct render render = {sendBlock, 101,
-                        //"websocket activate\n", 19,
-                                        "", 0,
-                        /*canKeepAlive*/1, *socketTimeout, stats, NULL, NULL,
-                                        acceptValue->data};
-                renderHttpMessage(&render);
-                freeBlock(acceptValue);
-                acceptValue = nullptr;
-
-                waitSemaphoreLeaf(websockets);
-                setHash(websockets, (unsigned char *) &currentSocket);
-                postSemaphoreLeaf(websockets);
-            }
-        } // websocket
         else if (startsWith("GET /stats.html", readBuffer)) {
             dataBlock = resetBlock(dataBlock);
 
@@ -439,7 +396,6 @@ void *clientTcpHandler(struct clientTcpArgs *args) {
     // unsigned int *maxPeersPerResponse = args->maxPeersPerResponse;
     // unsigned short *socketTimeout = args->socketTimeout;
     // unsigned char *keepAlive = args->keepAlive;
-    struct list *websockets = args->websockets;
 
     struct Eevent eevent;
     struct list *deleteSocketList = initList(NULL, 0, LIST_STARTING_NEST, sizeof(int), LIST_SEMAPHORE_DISABLE,
@@ -447,7 +403,6 @@ void *clientTcpHandler(struct clientTcpArgs *args) {
     struct deleteSocketListArgs deleteSocketListArgs;
     deleteSocketListArgs.socketList = socketList;
     deleteSocketListArgs.stats = stats;
-    deleteSocketListArgs.websockets = websockets;
 
     struct block *sendBlock = initBlock();
     struct block *dataBlock = initBlock();

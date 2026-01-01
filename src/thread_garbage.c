@@ -8,6 +8,7 @@
 #include "data_garbage.h"
 #include "stats.h"
 #include "interval.h"
+#include "websocket.h"
 #include "rps.h"
 #include "list.h"
 #include "socket.h"
@@ -33,7 +34,6 @@ struct garbageSocketTimeoutArgs {
     unsigned short *socketTimeout;
     long workers;
     long maxTimeAllow; // Временная переменная, чтобы не считать это значение для каждого подключения
-    struct list *websockets;
 };
 
 void *intervalChangerHandler(struct interval *interval);
@@ -124,7 +124,6 @@ void runGarbageSocketTimeoutThread(struct list **socketLists, struct stats *stat
     garbageSocketTimeoutArgs->stats = stats;
     garbageSocketTimeoutArgs->socketTimeout = socketTimeout;
     garbageSocketTimeoutArgs->workers = workers;
-    garbageSocketTimeoutArgs->websockets = websockets;
 
     pthread_t tid;
     pthread_create(&tid, NULL, (void *(*)(void *)) garbageSocketTimeoutHandler, garbageSocketTimeoutArgs);
@@ -139,7 +138,6 @@ unsigned char garbageSocketTimeoutCallback(struct list *list, struct item *item,
     struct socketData *socketData = item->data;
     struct stats *stats = ((struct garbageSocketTimeoutArgs *) args)->stats;
     long maxTimeAllow = ((struct garbageSocketTimeoutArgs *) args)->maxTimeAllow;
-    struct list *websockets = ((struct garbageSocketTimeoutArgs *) args)->websockets;
 
     if (socketData->time < maxTimeAllow) {
         struct block *block = initBlock();
@@ -149,8 +147,6 @@ unsigned char garbageSocketTimeoutCallback(struct list *list, struct item *item,
         freeBlock(block);
 
         // printf("garbage delete socket %d\n", socketData->socket);
-
-        deleteWebsocket(websockets, socketData->socket);
 
         deleteSocketItemL(item, stats);
     }

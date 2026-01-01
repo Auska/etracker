@@ -297,7 +297,6 @@ void showHelp() {
             "\n"
             "     " STRING_BOLD "--no-locations" STRING_RESET "\n"
             "             Disable locations features, default enable.\n"
-            "             Related url: " STRING_UNDERLINE "http://host:port/map.html" STRING_RESET "\n"
             "\n"
             "     " STRING_BOLD "-x" STRING_RESET " " STRING_UNDERLINE "xForwardedFor" STRING_RESET "\n"
             "             Http header name xForwardedFor, default disable.\n"

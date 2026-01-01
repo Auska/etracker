@@ -131,19 +131,6 @@ Displays real-time server statistics including:
 - Active connections
 - Peer and torrent counts
 
-### Realtime World Map
-
-```
-http://host:port/map.html
-```
-
-![map](https://raw.githubusercontent.com/truekenny/etracker/master/Pictures/map.gif)
-
-**Setup**: Download the free GeoIP database:
-```bash
-wget http://tace.ru/IP2LOCATION-LITE-DB5.CSV
-```
-
 ### Settings Page
 
 ```
@@ -429,9 +416,7 @@ torrent *structure* | item + hash + dataTorrent + list
 peer *structure* | item + hash + dataPeer  
 torrent | 116B
 peer | 108B
-locations | 28.5MB
-Startup w/o locations | 20.9MB
-Startup with locations | 49.4MB
+Startup | 20.9MB
 1M peers + 1M torrents | 224MB
 7M peers + 2M torrents | 988MB
 
@@ -469,8 +454,6 @@ If this were the result of dos scrape requests, then net-out would be clearly vi
     New 7 -> soft=64000, hard=1048576
     Current 4 -> soft=0, hard=18446744073709551615
     New 4 -> soft=18446744073709551615, hard=18446744073709551615
-    Loading locations…
-    Loading locations finished.
     ip: 0, iterations: 34
     Starting UDP worker 0/0
     Waiting UDP for incoming packets...
