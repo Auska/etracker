@@ -9,7 +9,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <pwd.h>
-#include <locale.h>
 #include <sys/resource.h>
 #include "sem.h"
 #include "alloc.h"
@@ -34,8 +33,6 @@ void setNobody();
 
 void setLimit(long long soft, int limitName);
 
-void setLocale(char *locale);
-
 int main(int argc, char *argv[]) {
     printf("Revision: %s\n", REVISION);
 
@@ -52,8 +49,6 @@ int main(int argc, char *argv[]) {
            "  maxInterval = %u\n"
            "  noTcp = %u\n"
            "  noUdp = %u\n"
-           "  charset = %s\n"
-           "  locale = %s\n"
            "  nofile = %llu\n"
            "  core = %lld\n"
            "  xForwardedFor = %s\n"
@@ -61,7 +56,7 @@ int main(int argc, char *argv[]) {
            ,
            arguments->port, arguments->interval, arguments->workers, arguments->maxPeersPerResponse,
            arguments->socketTimeout, arguments->keepAlive, arguments->minInterval, arguments->maxInterval,
-           arguments->noTcp, arguments->noUdp, arguments->charset, arguments->locale,
+           arguments->noTcp, arguments->noUdp,
            arguments->nofile, arguments->core, arguments->xForwardedFor, arguments->maxLoadAvg);
 
     struct interval interval;
@@ -94,10 +89,6 @@ int main(int argc, char *argv[]) {
 
     struct rps rps = {};
 
-    // Влияет на вывод: printf("%'s", 12.12);
-    // Влияет на atof
-    setLocale(arguments->locale);
-
     if (URI_RANDOM_DATA_INFO_HASH)
         printf("- Random data info_hash: %d\n", URI_RANDOM_DATA_INFO_HASH);
     if (URI_RANDOM_DATA_PEER_ID)
@@ -117,7 +108,6 @@ int main(int argc, char *argv[]) {
         serverTcpArgs->maxPeersPerResponse = &arguments->maxPeersPerResponse;
         serverTcpArgs->socketTimeout = &arguments->socketTimeout;
         serverTcpArgs->keepAlive = &arguments->keepAlive;
-        serverTcpArgs->charset = arguments->charset;
         serverTcpArgs->xForwardedFor = arguments->xForwardedFor;
 
         if (pthread_create(&tcpServerThread, NULL, (void *(*)(void *)) serverTcpHandler, serverTcpArgs) != 0) {
@@ -216,14 +206,4 @@ void setLimit(long long soft, int limitName) {
             printf("setrlimit error: %d: %s (maybe %'llu too large)\n", errno, strerror(errno), soft);
     } else
         printf("getrlimit error: %d: %s\n", errno, strerror(errno));
-}
-
-void setLocale(char *locale) {
-    char *_locale = "";
-
-    if (locale != NULL)
-        _locale = locale;
-
-    if (setlocale(LC_NUMERIC, _locale) == NULL)
-        printf("setlocale failed: %d: %s\n", errno, strerror(errno));
 }

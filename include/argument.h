@@ -11,12 +11,10 @@ struct arguments {
     unsigned int maxPeersPerResponse;
     unsigned short socketTimeout;
     unsigned char keepAlive;
-    char *charset;
     unsigned int minInterval;
     unsigned int maxInterval;
     unsigned char noTcp;
     unsigned char noUdp;
-    char *locale;
     rlim_t nofile;
     long long core;
     int failed;

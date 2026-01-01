@@ -16,18 +16,16 @@
 #define ARGUMENT_SOCKET_TIMEOUT_INDEX         5
 #define ARGUMENT_KEEP_ALIVE_INDEX             6
 #define ARGUMENT_HELP_INDEX                   7
-#define ARGUMENT_CHARSET_INDEX                8
-#define ARGUMENT_MIN_INTERVAL_INDEX           9
-#define ARGUMENT_MAX_INTERVAL_INDEX          10
-#define ARGUMENT_NO_TCP_INDEX                11
-#define ARGUMENT_NO_UDP_INDEX                12
-#define ARGUMENT_LOCALE_INDEX                13
-#define ARGUMENT_NOFILE_INDEX                14
-#define ARGUMENT_CORE_INDEX                  15
-#define ARGUMENT_FAILED_INDEX                16
-#define ARGUMENT_NO_LOCATIONS                17
-#define ARGUMENT_X_FORWARDED_FOR             18
-#define ARGUMENT_MAX_LOAD_AVG                19
+#define ARGUMENT_MIN_INTERVAL_INDEX           8
+#define ARGUMENT_MAX_INTERVAL_INDEX           9
+#define ARGUMENT_NO_TCP_INDEX                 10
+#define ARGUMENT_NO_UDP_INDEX                 11
+#define ARGUMENT_NOFILE_INDEX                 12
+#define ARGUMENT_CORE_INDEX                   13
+#define ARGUMENT_FAILED_INDEX                 14
+#define ARGUMENT_NO_LOCATIONS                 15
+#define ARGUMENT_X_FORWARDED_FOR              16
+#define ARGUMENT_MAX_LOAD_AVG                 17
 
 #define ARGUMENT_PORT_DEFAULT                3000
 #define ARGUMENT_INTERVAL_DEFAULT            1799
@@ -88,10 +86,6 @@ struct arguments *parseArguments(int argc, char *argv[]) {
             case ARGUMENT_HELP_INDEX:
                 showHelp();
                 break;
-            case ARGUMENT_CHARSET_INDEX:
-                arguments->charset = (index == argc - 1) ? NULL : argv[index + 1];
-                index++; // charset value
-                break;
             case ARGUMENT_MIN_INTERVAL_INDEX:
                 arguments->minInterval = argumentValue;
                 index++; // minInterval value
@@ -105,10 +99,6 @@ struct arguments *parseArguments(int argc, char *argv[]) {
                 break;
             case ARGUMENT_NO_UDP_INDEX:
                 arguments->noUdp = 1;
-                break;
-            case ARGUMENT_LOCALE_INDEX:
-                arguments->locale = (index == argc - 1) ? NULL : argv[index + 1];
-                index++; // locate value
                 break;
             case ARGUMENT_NOFILE_INDEX:
                 arguments->nofile = argumentValue;
@@ -174,8 +164,6 @@ unsigned int getName(char *name) {
         return ARGUMENT_KEEP_ALIVE_INDEX;
     } else if (!strcmp(name, "-h") || !strcmp(name, "--help")) {
         return ARGUMENT_HELP_INDEX;
-    } else if (!strcmp(name, "--charset")) {
-        return ARGUMENT_CHARSET_INDEX;
     } else if (!strcmp(name, "--min-interval")) {
         return ARGUMENT_MIN_INTERVAL_INDEX;
     } else if (!strcmp(name, "--max-interval")) {
@@ -184,8 +172,6 @@ unsigned int getName(char *name) {
         return ARGUMENT_NO_TCP_INDEX;
     } else if (!strcmp(name, "--no-udp")) {
         return ARGUMENT_NO_UDP_INDEX;
-    } else if (!strcmp(name, "--locale")) {
-        return ARGUMENT_LOCALE_INDEX;
     } else if (!strcmp(name, "--nofile")) {
         return ARGUMENT_NOFILE_INDEX;
     } else if (!strcmp(name, "--core")) {
@@ -219,9 +205,6 @@ void showHelp() {
             " [" STRING_BOLD "-k" STRING_RESET "]"
             " [" STRING_BOLD "--no-tcp" STRING_RESET "]"
             " [" STRING_BOLD "--no-udp" STRING_RESET "]"
-            " [" STRING_BOLD "--charset" STRING_RESET " " STRING_UNDERLINE "charset" STRING_RESET "]"
-            " [" STRING_BOLD "--locale" STRING_RESET " " STRING_UNDERLINE "locale" STRING_RESET "]\n"
-            "        "
             " [" STRING_BOLD "--min-interval" STRING_RESET " " STRING_UNDERLINE "min-interval" STRING_RESET "]"
             " [" STRING_BOLD "--max-interval" STRING_RESET " " STRING_UNDERLINE "max-interval" STRING_RESET "]\n"
             "        "
@@ -271,15 +254,6 @@ void showHelp() {
             "     " STRING_BOLD "--no-udp\n" STRING_RESET
             "             Disable UDP, default UDP enable.\n"
             "\n"
-            "     " STRING_BOLD "--charset" STRING_RESET " " STRING_UNDERLINE "charset" STRING_RESET "\n"
-            "             Charset for stats page only, default none.\n"
-            "             Only for stats page.\n"
-            "\n"
-            "     " STRING_BOLD "--locale" STRING_RESET " " STRING_UNDERLINE "locale" STRING_RESET "\n"
-            "             Locale for stats page, default current terminal's locale.\n"
-            "             If your stats page is a little broken, then I recommend\n"
-            "             the `en_US.UTF-8` locale.\n"
-            "\n"
             "     " STRING_BOLD "--min-interval" STRING_RESET " " STRING_UNDERLINE "min-interval" STRING_RESET "\n"
             "             Minimum interval to be reached based on load_avg, default %d.\n"
             "\n"
@@ -321,9 +295,6 @@ void showHelp() {
             "\n"
             "     Run with keep-alive, recommended expand nofile for more connection:\n"
             "          etracker -p 80 -k --nofile 10000\n"
-            "\n"
-            "     Run with special locale:\n"
-            "          etracker -p 80 --locale en_US.UTF-8 --charset utf-8\n"
             "\n"
             "     Run with save CPU:\n"
             "          etracker --min-interval 1799\n"

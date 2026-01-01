@@ -37,7 +37,6 @@ void *serverTcpHandler(struct serverTcpArgs *args) {
     unsigned int *maxPeersPerResponse = args->maxPeersPerResponse;
     unsigned short *socketTimeout = args->socketTimeout;
     unsigned char *keepAlive = args->keepAlive;
-    char *charset = args->charset;
     char *xForwardedFor = args->xForwardedFor;
 
     c_free(args);
@@ -91,7 +90,6 @@ void *serverTcpHandler(struct serverTcpArgs *args) {
         clientTcpArgs->maxPeersPerResponse = maxPeersPerResponse;
         clientTcpArgs->socketTimeout = socketTimeout;
         clientTcpArgs->keepAlive = keepAlive;
-        clientTcpArgs->charset = charset;
         clientTcpArgs->xForwardedFor = xForwardedFor;
 
         if (pthread_create(&tcpClientThread, NULL, (void *(*)(void *)) clientTcpHandler, clientTcpArgs) != 0) {

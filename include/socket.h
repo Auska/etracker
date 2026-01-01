@@ -29,7 +29,6 @@ struct render {
     int canKeepAlive;
     unsigned short socketTimeout;
     struct stats *stats;
-    char *charset;
     char *contentType;
     char *websocketKey;
 };

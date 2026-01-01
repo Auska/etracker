@@ -57,7 +57,6 @@ void processRead(struct clientTcpArgs *args, int currentSocket, struct list *del
     unsigned int *maxPeersPerResponse = args->maxPeersPerResponse;
     unsigned short *socketTimeout = args->socketTimeout;
     unsigned char *keepAlive = args->keepAlive;
-    char *charset = args->charset;
     char *xForwardedFor = args->xForwardedFor;
 
     unsigned char *pCurrentSocket = (unsigned char *) &currentSocket;
@@ -252,7 +251,7 @@ void processRead(struct clientTcpArgs *args, int currentSocket, struct list *del
             formatStats(threadNumber, dataBlock, stats, interval, rps);
 
             struct render render = {sendBlock, 200, dataBlock->data, dataBlock->size, canKeepAlive,
-                                    *socketTimeout, stats, charset, "text/html"};
+                                    *socketTimeout, stats, "text/html"};
             renderHttpMessage(&render);
         } // stats
         else if (startsWith("GET / ", readBuffer)) {

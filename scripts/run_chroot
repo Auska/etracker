@@ -4,8 +4,8 @@ clear
 failed=0
 
 chmod 777 ./
-ldd etracker | grep "=> /" | awk '{print $3}' | xargs -I '{}' cp -v --parents '{}' ./
-ldd etracker | grep -e "^\s*/" | awk '{print $1}' | xargs -I '{}' cp -v --parents '{}' ./
+ldd build/etracker | grep "=> /" | awk '{print $3}' | xargs -I '{}' cp -v --parents '{}' ./
+ldd build/etracker | grep -e "^\s*/" | awk '{print $1}' | xargs -I '{}' cp -v --parents '{}' ./
 
 # Почему-то эта библиотека не видна через ldd, она нужна для getpwnam
 cp --parents /lib/x86_64-linux-gnu/libnss_compat.so.2 ./
@@ -30,13 +30,9 @@ fi
 mkdir dev
 mount --rbind /dev dev/
 
-# Для setlocale (локаль может быть отдельной директорией или в архиве)
-cp -L -r --parents /usr/lib/locale/en_US.utf8/ ./
-cp --parents /usr/lib/locale/locale-archive ./
-
 while true; do
   date
-  chroot ./ /etracker -p $1 -i 300 --min-interval 300 -e 300 -k --nofile 64000 --core -1 --charset utf-8 --locale en_US.UTF-8 -f $failed -a 0.5
+  chroot ./ /etracker -p $1 -i 300 --min-interval 300 -e 300 -k --nofile 64000 --core -1 -f $failed -a 0.5
   echo Exit code: $?
   ((failed=failed+1))
   sleep 1

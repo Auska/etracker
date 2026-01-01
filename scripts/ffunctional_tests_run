@@ -4,12 +4,12 @@ trap 'kill $(jobs -p)' EXIT
 
 clear
 
-./etracker --no-locations &
+./build/etracker &
 
 sleep 1
 echo Start Testing
 
-gcc origin-udp/_client_udp.c string.c -o client-udp.o -lm || exit
+gcc functional_tests/_client_udp.c src/string.c -I include -o client-udp.o -lm || exit
 
 echo Base Tests
 

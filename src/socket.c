@@ -99,15 +99,10 @@ void renderHttpMessage(struct render *render) {
         }
     }
 
-    if (render->charset == NULL && render->contentType == NULL) {
+    if (render->contentType == NULL) {
         addFormatStringBlock(render->block, 1000, "Content-Type: text/plain\r\n");
-    } else if (render->charset == NULL && render->contentType != NULL) {
+    } else {
         addFormatStringBlock(render->block, 1000, "Content-Type: %s\r\n", render->contentType);
-    } else if (render->charset != NULL && render->contentType == NULL) {
-        addFormatStringBlock(render->block, 1000, "Content-Type: text/plain; charset=%s\r\n", render->charset);
-    } else if (render->charset != NULL && render->contentType != NULL) {
-        addFormatStringBlock(render->block, 1000, "Content-Type: %s; charset=%s\r\n", render->contentType,
-                             render->charset);
     }
 
     addFormatStringBlock(render->block, 1000, "Content-Length: %zu\r\n"

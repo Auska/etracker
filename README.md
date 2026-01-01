@@ -68,8 +68,6 @@ Available options:
 - `-k, --keep-alive` - Enable HTTP keep-alive
 - `--no-tcp` - Disable TCP
 - `--no-udp` - Disable UDP
-- `--charset CHARSET` - Character set (default: utf-8)
-- `--locale LOCALE` - Locale setting (default: en_US.UTF-8)
 - `-a, --max-load-avg LOAD` - Maximum load average
 - `-e, --socket-timeout SECONDS` - Socket timeout (default: 3)
 - `-f, --failed COUNT` - Number of restart attempts on failure
@@ -207,10 +205,7 @@ Starting configuration:
   maxInterval = 1799
   noTcp = 0
   noUdp = 0
-  charset = utf-8
-  locale = en_US.UTF-8
-This system has 1 processors available.
-Current 7 -> soft=1024, hard=1048576
+  This system has 1 processors available.Current 7 -> soft=1024, hard=1048576
 New 7 -> soft=64000, hard=1048576
 Current 4 -> soft=0, hard=18446744073709551615
 New 4 -> soft=18446744073709551615, hard=18446744073709551615

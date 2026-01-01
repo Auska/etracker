@@ -95,8 +95,6 @@ cmake --build build
 - `-k, --keep-alive` - 启用 HTTP keep-alive
 - `--no-tcp` - 禁用 TCP
 - `--no-udp` - 禁用 UDP
-- `--charset` - 字符集(默认 utf-8)
-- `--locale` - 区域设置(默认 en_US.UTF-8)
 - `--nofile` - 文件描述符限制
 - `--core` - 核心转储限制
 - `-a, --max-load-avg` - 最大负载平均值

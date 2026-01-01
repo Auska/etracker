@@ -23,7 +23,6 @@ struct serverTcpArgs {
     unsigned int *maxPeersPerResponse;
     unsigned short *socketTimeout;
     unsigned char *keepAlive;
-    char *charset;
 
     struct list *websockets;
     char *xForwardedFor;

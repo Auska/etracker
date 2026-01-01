@@ -7,7 +7,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include "../string.h"
+#include "et_string.h"
 
 #define PORT        3000
 #define MAXLINE     1024
